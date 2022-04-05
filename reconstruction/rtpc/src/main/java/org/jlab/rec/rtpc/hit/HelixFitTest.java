@@ -58,10 +58,10 @@ public class HelixFitTest {
         List<RecoHitVector> trackhitsA = new ArrayList<>();
         List<RecoHitVector> trackhitsB = new ArrayList<>();
         List<RecoHitVector> originaltrack = new ArrayList<>(track);
-        if(track.get(0).flag() > 0){
+        if(track.get(0).flag() > 0 ){
             for(RecoHitVector hit : track){
-                if(hit.flag() == 1) trackhitsA.add(hit);
-                else if(hit.flag() == 2) trackhitsB.add(hit);
+                 if(hit.flag() == 1 ) trackhitsA.add(hit);
+                 if(hit.flag() == 2) trackhitsB.add(hit);
             }
         }
 
@@ -74,7 +74,7 @@ public class HelixFitTest {
         boolean trackbused = false; 
         int numhitsA = 0;
         int numhitsB = 0; 
-        if(trackhitsA.size() > 0 && trackhitsB.size() > 0){
+        if(trackhitsA.size() > 10 ) {
             numhitsA = trackhitsA.size();
             numhitsB = trackhitsB.size();
             szpos = new double[numhitsA][3];
@@ -86,7 +86,7 @@ public class HelixFitTest {
             }
             ho = h.HelixFit(hit,szpos,fittobeamline);   
             ho.set_magfield(magfield);         
-            if(ho.get_Rho() > 0){ 
+            if(ho.get_Rho() > 0 && trackhitsB.size() > 10 ){ 
                 ho = new HelixFitObject();
                 szpos = new double[numhitsB][3];
                 hit = 0; 
@@ -105,7 +105,7 @@ public class HelixFitTest {
                 numhits = numhitsA;
                 track = trackhitsA;
             }
-        }else{
+          }else{
             szpos = new double[numhits][3];
             hit = 0; 
             for(hit = 0; hit < numhits; hit++){
@@ -115,7 +115,7 @@ public class HelixFitTest {
             }
             ho = h.HelixFit(hit,szpos,fittobeamline); 
             ho.set_magfield(magfield);
-        }
+            }
 
         double ADCsum = 0;
         hit = 0;

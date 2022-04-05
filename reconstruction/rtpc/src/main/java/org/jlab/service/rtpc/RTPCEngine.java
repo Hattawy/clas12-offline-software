@@ -47,7 +47,7 @@ public class RTPCEngine extends ReconstructionEngine{
         String cosm = this.getEngineConfigString("rtpcCosmic");
         String beamfit = this.getEngineConfigString("rtpcBeamlineFit");
         String disentangler = this.getEngineConfigString("rtpcDisentangler");
-	String chi2cull = this.getEngineConfigString("rtpcChi2Cull");
+	    String chi2cull = this.getEngineConfigString("rtpcChi2Cull");
         //System.out.println(sim + " " + cosm + " " + beamfit);
 
         if(sim != null){
@@ -67,7 +67,7 @@ public class RTPCEngine extends ReconstructionEngine{
         }
 
         if(chi2cull != null){
-           chi2culling = Boolean.valueOf(chi2cull);
+            chi2culling = Boolean.valueOf(chi2cull);
         }
 
         String[] rtpcTables = new String[]{
@@ -102,12 +102,14 @@ public class RTPCEngine extends ReconstructionEngine{
         }
 
          int runNo = 10;
+         int eventNo = 777;
         double magfield = 50.0;
         double magfieldfactor = 1;
 
         if(event.hasBank("RUN::config")==true){
             DataBank bank = event.getBank("RUN::config");
             runNo = bank.getInt("run", 0);
+            eventNo = bank.getInt("event",0);
             magfieldfactor = bank.getFloat("solenoid",0);
             if (runNo<=0) {
                 System.err.println("RTPCEngine:  got run <= 0 in RUN::config, skipping event.");
@@ -117,8 +119,9 @@ public class RTPCEngine extends ReconstructionEngine{
 	
         magfield = 50 * magfieldfactor;
         IndexedTable global_parms = this.getConstantsManager().getConstants(runNo, "/calibration/rtpc/global_parms");
-        int hitsbound;
+        int hitsbound = 15000;
         hitsbound = (int) global_parms.getDoubleValue("MaxHitsEvent",0,0,0);
+        if(hitsbound < 1) hitsbound = 15000; 
         if(hits.size() > hitsbound) return true; 
 
         if(event.hasBank("RTPC::adc")){
@@ -131,7 +134,7 @@ public class RTPCEngine extends ReconstructionEngine{
             //Calculate Average Time of Hit Signals
             TimeAverage TA = new TimeAverage(this.getConstantsManager(),params,runNo);
             //Disentangle Crossed Tracks
-            TrackDisentangler TD = new TrackDisentangler(params,disentangle);
+            TrackDisentangler TD = new TrackDisentangler(params,disentangle,eventNo);
             //Reconstruct Hits in Drift Region
             TrackHitReco TR = new TrackHitReco(params,hits,cosmic,magfield);
             //Helix Fit Tracks to calculate Track Parameters
